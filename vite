@@ -1,0 +1,12 @@
+export const WORDS: string[] = [
+  'WORDS',
+  'REACT',
+  'VITES',
+  'SPEED',
+  'HELLO',
+  'WORLD',
+  'CODED',
+  'TYPES',
+  'WORDS',
+  'BUILD',
+];
