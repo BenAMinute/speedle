@@ -16,20 +16,19 @@
 - [x] Create the logic for coloring letters (correct, present, absent).
 - [x] Implement the virtual keyboard state (disabling used keys, coloring them).
 - [x] Add "Game Over" state for a single word (e.g., 6 failed guesses).
-- [ ] Implement the main timer logic (countdown based on selected mode: Easy/90s, Medium/60s, Hard/30s).
 - [ ] Implement "Next Word" functionality:
     - [ ] Fetch/select a new word from a list upon successful completion.
     - [ ] Reset the local grid state for the new word.
-- [ ] Implement "Game Over" state for the overall game (timer hits zero).
-- [ ] Add a "Game Summary" screen showing total words completed and final time.
+- [x] Implement "Game Over" state for the overall game (timer hits zero).
+- [x] Add a "Game Summary" screen showing total words completed and final time.
 
 ### Phase 3: Game Loop & Timer
-- [ ] Implement the main timer logic (countdown based on selected mode: Easy/90s, Medium/60s, Hard/30s).
-- [ ] Implement "Next Word" functionality:
-    - [ ] Fetch/select a new word from a list upon successful completion.
-    - [ ] Reset the local grid state for the new word.
-- [ ] Implement "Game Over" state for the overall game (timer hits zero).
-- [ ] Add a "Game Summary" screen showing total words completed and final time.
+- [x] Implement the main timer logic (countdown based on selected mode: Easy/90s, Medium/60s, Hard/30s).
+- [x] Implement "Next Word" functionality:
+    - [x] Fetch/select a new word from a list upon successful completion.
+    - [x] Reset the local grid state for the new word.
+- [x] Implement "Game Over" state for the overall game (timer hits zero).
+- [x] Add a "Game Summary" screen showing total words completed and final time.
 
 ### Phase 4: Firebase & Backend Integration
 - [ ] Set up Google Firebase project and initialize in the workspace.
@@ -45,3 +44,8 @@
 - [ ] Add sound effects (optional but nice).
 - [ ] Implement "High Score" persistence using `localStorage` (or Firestore for cloud sync).
 - [ ] Mobile responsiveness optimization.
+
+
+### Important notes
+- [ ] cache for first time users, whether it be cookies or what. but a tutorial that pops up when first loaded, and does not pop up when user has visited the site before
+- [ ] Fix the lettering inside of the grid. Still unable to type through keyboard.

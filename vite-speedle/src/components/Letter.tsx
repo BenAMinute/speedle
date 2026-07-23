@@ -7,15 +7,22 @@ interface LetterProps {
 }
 
 const Letter: React.FC<LetterProps> = ({ letter, status }) => {
-  const statusStyles: Record<LetterStatus, string> = {
-    correct: 'bg-green-600 border-green-700',
-    present: 'bg-yellow-600 border-yellow-700',
-    absent: 'bg-gray-700 border-gray-800',
-    empty: 'bg-gray-800 border-gray-900',
+  const statusStyles: Record<LetterStatus, React.CSSProperties> = {
+    correct: { backgroundColor: '#16a34a', borderColor: '#15803d' },
+    present: { backgroundColor: '#ca8a04', borderColor: '#a16207' },
+    absent: { backgroundColor: '#374151', borderColor: '#1f2937' },
+    empty: { backgroundColor: '#1f2937', borderColor: '#111827' },
   };
 
   return (
-    <div className={`w-14 h-14 flex items-center justify-center text-2xl font-bold border-2 rounded ${statusStyles[status]}`}>
+    <div
+      className="flex items-center justify-center text-2xl font-bold border-2 rounded"
+      style={{
+        width: '56px',
+        height: '56px',
+        ...statusStyles[status],
+      }}
+    >
       {letter}
     </div>
   );

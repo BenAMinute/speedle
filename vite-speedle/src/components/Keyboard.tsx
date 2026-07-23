@@ -22,17 +22,37 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, letterStatuses }) => {
             const status = letterStatuses[key];
             
             const getStatusStyles = () => {
-              if (status === 'correct') return 'bg-green-600 border-green-700';
-              if (status === 'present') return 'bg-yellow-600 border-yellow-700';
-              if (status === 'absent') return 'bg-gray-700 border-gray-800';
-              return 'bg-gray-800 border-gray-900';
+              if (status === 'correct') return { backgroundColor: '#16a34a', borderColor: '#15803d' };
+              if (status === 'present') return { backgroundColor: '#ca8a04', borderColor: '#a16207' };
+              if (status === 'absent') return { backgroundColor: '#374151', borderColor: '#1f2937' };
+              return { backgroundColor: '#1f2937', borderColor: '#111827' };
             };
 
             return (
               <button
                 key={key}
                 onClick={() => onKeyPress(key)}
-                className={`key ${isSpecial ? 'special-key' : ''} ${getStatusStyles()}`}
+                onKeyDown={(e) => {
+                  if (e.key === key) {
+                    e.preventDefault();
+                    onKeyPress(key);
+                  }
+                }}
+                className={`key ${isSpecial ? 'special-key' : ''}`}
+                style={{
+                  ...getStatusStyles(),
+                  // Ensure the button is clickable and has correct layout
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  minWidth: isSpecial ? '80px' : '40px',
+                  padding: '12px',
+                  border: '2px solid #333',
+                  borderRadius: '4px',
+                  fontWeight: 'bold',
+                  fontSize: '1.2rem'
+                }}
               >
                 {key}
               </button>

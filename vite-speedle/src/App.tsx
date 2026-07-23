@@ -11,7 +11,7 @@ import type { Guess, LetterStatus } from './types'
 const WORD_LIST = ['APPLE', 'BEACH', 'CLOUD', 'DANCE', 'EARTH', 'FLAME', 'GRAPE', 'HOUSE', 'INDEX', 'JUICE', 'KNIFE', 'LIGHT', 'MELON', 'NIGHT', 'OCEAN', 'PIANO', 'QUEEN', 'RIVER', 'SPACE', 'TIGER', 'UNDER', 'VOICE', 'WATER', 'YOUTH', 'ZEBRA'];
 
 function App() {
-  const [targetWord] = useState(WORD_LIST[0]);
+  const [targetWord, setTargetWord] = useState(WORD_LIST[0]);
   const [guesses, setGuesses] = useState<Guess[]>([])
 
   const [currentGuess, setCurrentGuess] = useState('')
@@ -22,6 +22,8 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(90);
   const [selectedMode, setSelectedMode] = useState<GameMode>('easy');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [totalWordsCompleted, setTotalWordsCompleted] = useState(0);
+  const [finalTime, setFinalTime] = useState(0);
 
   const startGame = () => {
     setGameState('playing');
@@ -30,6 +32,7 @@ function App() {
     setLetterStatuses({});
     setGameStatus('playing');
     setTimeLeft(GameModeConfigs[selectedMode].timeLimit);
+    setTargetWord(WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]);
   };
 
   useEffect(() => {
@@ -39,6 +42,7 @@ function App() {
           if (prev <= 1) {
             setGameStatus('lost');
             setGameState('lost');
+            setFinalTime(0);
             if (timerRef.current) clearInterval(timerRef.current);
             return 0;
           }
@@ -113,6 +117,19 @@ function App() {
         if (status.every(s => s === 'correct')) {
           setGameStatus('won')
           setGameState('won')
+          
+          // Fetch next word
+          const nextWordIndex = (WORD_LIST.indexOf(targetWord) + 1) % WORD_LIST.length;
+          setTargetWord(WORD_LIST[nextWordIndex]);
+          
+          // Reset local grid state for the new word
+          setGuesses([]);
+          setCurrentGuess('');
+          setLetterStatuses({});
+
+          // Update stats
+          setTotalWordsCompleted(prev => prev + 1);
+          setFinalTime(timeLeft);
         } else if (guesses.length >= 5) {
           setGameStatus('lost')
           setGameState('lost')
@@ -128,7 +145,22 @@ function App() {
 
     if (key.length === 1 && key.match(/[A-Z]/)) {
       if (currentGuess.length < targetWord.length && !currentGuess.includes(key)) {
-        setCurrentGuess(prev => prev + key)
+        const newGuessStr = currentGuess + key;
+        setCurrentGuess(newGuessStr);
+
+        if (guesses.length > 0) {
+          const newGuesses = [...guesses];
+          newGuesses[newGuesses.length - 1] = {
+            letters: newGuessStr.split(''),
+            status: new Array(newGuessStr.length).fill('empty'),
+          };
+          setGuesses(newGuesses);
+        } else {
+          setGuesses([{
+            letters: newGuessStr.split(''),
+            status: new Array(newGuessStr.length).fill('empty'),
+          }]);
+        }
       }
     }
   }
@@ -155,6 +187,12 @@ function App() {
       <div className="game-summary">
         <h1 className="title">{gameState === 'won' ? 'You Won!' : 'Game Over'}</h1>
         <p>Target Word: {targetWord}</p>
+        {gameState === 'won' && (
+          <div className="summary-stats">
+            <p>Words Completed: {totalWordsCompleted}</p>
+            <p>Final Time: {finalTime}s</p>
+          </div>
+        )}
         <button onClick={startGame}>Play Again</button>
       </div>
     )
@@ -197,7 +235,7 @@ function App() {
         </div>
       </div>
       <div id="game-area">
-        <Grid guesses={guesses} />
+        <Grid guesses={guesses} targetWordLength={targetWord.length} />
         <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />
       </div>
     </div>
