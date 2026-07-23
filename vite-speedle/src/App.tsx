@@ -125,34 +125,34 @@ function App() {
     }
 
         if (key.length === 1 && key.match(/[A-Z]/)) {
-      if (currentGuess.length < targetWordLength) {
-        const newGuessStr = currentGuess + key;
-        setCurrentGuess(newGuessStr);
-        
-        if (guesses.length > 0) {
-          const newGuesses = [...guesses];
-          const lastGuess = newGuesses[newGuesses.length - 1];
-          
-          if (lastGuess && lastGuess.letters.length === targetWordLength) {
-            newGuesses.push({
-              letters: newGuessStr.split(''),
-              status: new Array(newGuessStr.length).fill('empty'),
-            });
-          } else {
-            newGuesses[newGuesses.length - 1] = {
-              letters: newGuessStr.split(''),
-              status: new Array(newGuessStr.length).fill('empty'),
-            };
+          if (currentGuess.length < targetWordLength) {
+            const newGuessStr = currentGuess + key;
+            setCurrentGuess(newGuessStr);
+            
+            if (guesses.length > 0) {
+              const newGuesses = [...guesses];
+              const lastGuess = newGuesses[newGuesses.length - 1];
+              
+              if (lastGuess && lastGuess.letters.length === targetWordLength) {
+                newGuesses.push({
+                  letters: newGuessStr.split(''),
+                  status: new Array(newGuessStr.length).fill('empty'),
+                });
+              } else {
+                newGuesses[newGuesses.length - 1] = {
+                  letters: newGuessStr.split(''),
+                  status: new Array(newGuessStr.length).fill('empty'),
+                };
+              }
+              setGuesses(newGuesses);
+            } else {
+              setGuesses([{
+                letters: newGuessStr.split(''),
+                status: new Array(newGuessStr.length).fill('empty'),
+              }]);
+            }
           }
-          setGuesses(newGuesses);
-        } else {
-          setGuesses([{
-            letters: newGuessStr.split(''),
-            status: new Array(newGuessStr.length).fill('empty'),
-          }]);
         }
-      }
-    }
 
   }
 
