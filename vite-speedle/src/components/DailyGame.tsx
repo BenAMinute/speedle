@@ -58,7 +58,19 @@ const DailyGame: React.FC<DailyGameProps> = ({ onBack }) => {
         guessLetters.forEach((letter, index) => {
           const s = status[index];
           if (s !== 'empty') {
-            newLetterStatuses[letter] = s;
+            const existingStatus = letterStatuses[letter];
+            
+            // Precedence: correct (3) > present (2) > absent (1) > empty (0)
+            const statusPriority: Record<LetterStatus, number> = {
+              'correct': 3,
+              'present': 2,
+              'absent': 1,
+              'empty': 0,
+            };
+
+            if (!existingStatus || statusPriority[s] > statusPriority[existingStatus]) {
+              newLetterStatuses[letter] = s;
+            }
           }
         });
         setLetterStatuses(newLetterStatuses);

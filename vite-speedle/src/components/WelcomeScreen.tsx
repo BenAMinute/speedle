@@ -13,7 +13,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartDaily, onStartPrac
         A fast-paced Wordle clone. Guess the word before the timer runs out!
       </p>
       <div className="tutorial">
-        <p>1. Type a 6-letter word.</p>
+        <p>1. Type a 5-letter word.</p>
         <p>2. Watch the colors: Green for correct, Yellow for present, Gray for absent.</p>
         <p>3. Beat the clock!</p>
       </div>

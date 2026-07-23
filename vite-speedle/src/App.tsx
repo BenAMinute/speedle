@@ -13,7 +13,7 @@ const WORD_LIST = ['APPLE', 'BEACH', 'CLOUD', 'DANCE', 'EARTH', 'FLAME', 'GRAPE'
 function App() {
   const [targetWord, setTargetWord] = useState(WORD_LIST[0]);
   const [guesses, setGuesses] = useState<Guess[]>([])
-
+  const [targetWordLength, setTargetWordLength] = useState(6);
   const [currentGuess, setCurrentGuess] = useState('')
   const [letterStatuses, setLetterStatuses] = useState<Record<string, LetterStatus>>({})
   const [gameStatus, setGameStatus] = useState<'playing' | 'won' | 'lost'>('playing')
@@ -25,44 +25,43 @@ function App() {
   const [totalWordsCompleted, setTotalWordsCompleted] = useState(0);
   const [finalTime, setFinalTime] = useState(0);
 
+
   const startGame = () => {
     setGameState('playing');
     setGuesses([]);
     setCurrentGuess('');
     setLetterStatuses({});
     setGameStatus('playing');
-    setTimeLeft(GameModeConfigs[selectedMode].timeLimit);
-    setTargetWord(WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]);
+    setTimeLeft(GameModeConfigs[selectedMode as keyof typeof GameModeConfigs].timeLimit);
+    const newWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    setTargetWord(newWord);
+    setTargetWordLength(newWord.length);
+  };
+
+  const nextWord = () => {
+    const newWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    setTargetWord(newWord);
+    setTargetWordLength(newWord.length);
+    setGuesses([]);
+    setCurrentGuess('');
+    setLetterStatuses({});
   };
 
   useEffect(() => {
-    if (gameState === 'playing' && gameStatus === 'playing') {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            setGameStatus('lost');
-            setGameState('lost');
-            setFinalTime(0);
-            if (timerRef.current) clearInterval(timerRef.current);
-            return 0;
-          }
-          return prev - 1;
-        });
+    if (gameState === 'playing' && gameStatus === 'won') {
+      // Small delay before moving to next word to let the user see the "correct" status
+      const timer = setTimeout(() => {
+        nextWord();
       }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [gameState, gameStatus, selectedMode]);
+  }, [gameStatus]);
 
   const handleKeyPress = (key: string) => {
     if (gameState !== 'playing') return;
 
     if (key === 'ENTER') {
-      if (currentGuess.length === targetWord.length) {
+      if (currentGuess.length === targetWordLength) {
         const guessLetters = currentGuess.split('')
         const status: LetterStatus[] = new Array(guessLetters.length).fill('empty')
         
@@ -101,38 +100,20 @@ function App() {
           letters: guessLetters,
           status: status,
         }
-        setGuesses(prev => [...prev, newGuess])
-        setCurrentGuess('')
+        const newGuesses = [...guesses, newGuess];
+        setGuesses(newGuesses);
+        setCurrentGuess('');
         
-        // Update keyboard statuses
-        const newLetterStatuses: Record<string, LetterStatus> = {}
-        guessLetters.forEach((letter, index) => {
-          const s = status[index]
-          if (s !== 'empty') {
-            newLetterStatuses[letter] = s
-          }
-        })
-        setLetterStatuses(newLetterStatuses)
-
         if (status.every(s => s === 'correct')) {
-          setGameStatus('won')
-          setGameState('won')
-          
-          // Fetch next word
-          const nextWordIndex = (WORD_LIST.indexOf(targetWord) + 1) % WORD_LIST.length;
-          setTargetWord(WORD_LIST[nextWordIndex]);
-          
-          // Reset local grid state for the new word
-          setGuesses([]);
-          setCurrentGuess('');
-          setLetterStatuses({});
-
-          // Update stats
+          setGameStatus('won');
           setTotalWordsCompleted(prev => prev + 1);
-          setFinalTime(timeLeft);
-        } else if (guesses.length >= 5) {
-          setGameStatus('lost')
-          setGameState('lost')
+          // Keep state in 'playing' for successful rounds during timed session
+          // The nextWord logic is handled by the useEffect that watches gameStatus === 'won'
+        } else if (newGuesses.length >= 6) {
+          setGameStatus('lost');
+          // Do NOT setGameState('lost') here. 
+          // Only setGameState('lost') when the timer runs out.
+          nextWord(); // Reset to a new word so the user can keep playing
         }
       }
       return
@@ -143,17 +124,26 @@ function App() {
       return
     }
 
-    if (key.length === 1 && key.match(/[A-Z]/)) {
-      if (currentGuess.length < targetWord.length && !currentGuess.includes(key)) {
+        if (key.length === 1 && key.match(/[A-Z]/)) {
+      if (currentGuess.length < targetWordLength) {
         const newGuessStr = currentGuess + key;
         setCurrentGuess(newGuessStr);
-
+        
         if (guesses.length > 0) {
           const newGuesses = [...guesses];
-          newGuesses[newGuesses.length - 1] = {
-            letters: newGuessStr.split(''),
-            status: new Array(newGuessStr.length).fill('empty'),
-          };
+          const lastGuess = newGuesses[newGuesses.length - 1];
+          
+          if (lastGuess && lastGuess.letters.length === targetWordLength) {
+            newGuesses.push({
+              letters: newGuessStr.split(''),
+              status: new Array(newGuessStr.length).fill('empty'),
+            });
+          } else {
+            newGuesses[newGuesses.length - 1] = {
+              letters: newGuessStr.split(''),
+              status: new Array(newGuessStr.length).fill('empty'),
+            };
+          }
           setGuesses(newGuesses);
         } else {
           setGuesses([{
@@ -163,7 +153,56 @@ function App() {
         }
       }
     }
+
   }
+
+  useEffect(() => {
+    if (gameState === 'playing' && gameStatus === 'playing') {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            setGameStatus('lost');
+            setGameState('lost');
+            setFinalTime(prev);
+            if (timerRef.current) clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [gameState, gameStatus, selectedMode]);
+
+  useEffect(() => {
+    if (gameState === 'playing') {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        const key = e.key.toUpperCase();
+        
+        if (key === 'ENTER') {
+          e.preventDefault();
+          handleKeyPress('ENTER');
+        } else if (key === 'BACKSPACE' || key === 'DELETE') {
+          e.preventDefault();
+          handleKeyPress('DELETE');
+        } else if (/^[A-Z]$/.test(key)) {
+          handleKeyPress(key);
+        } else if (key === 'TAB') {
+          e.preventDefault();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [gameState]);
 
   if (gameState === 'welcome') {
     return <WelcomeScreen 
@@ -202,7 +241,7 @@ function App() {
     <div className="app-container">
       <h1 className="title">Speedle</h1>
       <div className="game-header">
-        <div className="score-display">Score: 0</div>
+        <div className="score-display">Score: {totalWordsCompleted}</div>
         <div className="timer-display">Time: {timeLeft}s</div>
         <div className="mode-selector">
           <button 
@@ -235,7 +274,7 @@ function App() {
         </div>
       </div>
       <div id="game-area">
-        <Grid guesses={guesses} targetWordLength={targetWord.length} />
+        <Grid guesses={guesses} targetWordLength={targetWordLength} />
         <Keyboard onKeyPress={handleKeyPress} letterStatuses={letterStatuses} />
       </div>
     </div>

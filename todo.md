@@ -12,15 +12,15 @@
 - [x] Create Daily Game page (speedle.fun/daily).
 
 #### Phase 1 assessment merge (2026-07-23)
-- [ ] Resolve rule/copy mismatch for word length:
+- [x] Resolve rule/copy mismatch for word length:
     - `WelcomeScreen` says "Type a 6-letter word" but gameplay currently uses 5-letter words.
     - Decide and standardize one rule across tutorial, validation, and word lists.
 
-- [ ] Fix grid sizing to use dynamic target length:
+- [x] Fix grid sizing to use dynamic target length:
     - Verified error: `TS6133` + ESLint unused var for `targetWordLength` in `Grid.tsx`.
     - Replace hardcoded `Array.from({ length: 5 })` with `Array.from({ length: targetWordLength })`.
 
-- [ ] Clean and stabilize CSS baseline (`App.css` and `index.css`):
+- [x] Clean and stabilize CSS baseline (`App.css` and `index.css`):
     - Remove leftover template/nested blocks that reduce maintainability.
     - Keep responsive behavior explicit and verify desktop/mobile rendering.
     - Harmonize global theme variables with game-specific palette to avoid conflicts.
@@ -37,20 +37,18 @@
 - [x] Add a "Game Summary" screen showing total words completed and final time.
 
 #### Phase 2 assessment merge (2026-07-23)
-- [ ] Correct win-flow sequencing in `App.tsx`:
+- [x] Correct win-flow sequencing in `App.tsx`:
     - Current behavior sets `gameState = 'won'` before next-word reset.
     - This interrupts the speed session and routes to end-state UI.
     - Keep state in `'playing'` for successful rounds during timed session.
 
-- [ ] Reconcile "single word lost" vs "entire session lost":
+- [x] Reconcile "single word lost" vs "entire session lost":
     - Current logic can end the whole game after 6 failed guesses.
     - Choose one intended rule and apply consistently in logic and UI text.
 
-- [ ] Remove duplicate-letter input restriction:
-    - Current condition `!currentGuess.includes(key)` blocks valid repeated-letter words.
-    - Allow repeated letters while respecting max length.
+- [x] Remove duplicate-letter restriction:
 
-- [ ] Add keyboard status precedence logic:
+- [x] Add keyboard status precedence logic:
     - Prevent downgrading a key state (for example, `correct` should never become `present`/`absent`).
     - Use precedence: `correct` > `present` > `absent` > `empty`.
 
@@ -63,17 +61,17 @@
 - [x] Add a "Game Summary" screen showing total words completed and final time.
 
 #### Phase 3 assessment merge (2026-07-23)
-- [ ] Add full physical keyboard support for gameplay:
+- [X] Add full physical keyboard support for gameplay:
     - Current handling is primarily virtual keyboard button clicks.
     - Add app-level `keydown` listener when state is `'playing'`.
     - Map `Enter` -> `ENTER`, `Backspace/Delete` -> `DELETE`, and `a-z` -> uppercase letters.
 
-- [ ] Align score/timer UI with real session data:
+- [x] Align score/timer UI with real session data:
     - Header currently renders `Score: 0` statically.
     - Bind score to actual metrics (`totalWordsCompleted`, streak, or points).
     - Keep summary metrics and in-game header definitions consistent.
 
-- [ ] Verify session transition behavior:
+- [x] Verify session transition behavior:
     - Solve word -> continue same timed session.
     - Timer reaches zero -> summary/end state.
     - Confirm no premature summary trigger after a round win.

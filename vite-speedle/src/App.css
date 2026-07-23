@@ -4,9 +4,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #121212;
-  color: white;
-  font-family: sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
   padding: 20px;
 }
 
@@ -23,20 +23,22 @@
 .score-display, .timer-display {
   font-size: 1.5rem;
   font-weight: bold;
+  color: var(--text-h);
 }
 
 .mode-selector button {
   padding: 8px 16px;
   margin-left: 10px;
   cursor: pointer;
-  background: #333;
-  color: white;
-  border: 1px solid #555;
+  background: var(--code-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 4px;
 }
 
 .mode-selector button:hover {
-  background: #444;
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }
 
 #game-area {
@@ -47,13 +49,14 @@
   width: 100%;
   max-width: 600px;
   padding: 20px;
-  background-color: #1a1a1a;
+  background-color: var(--code-bg);
   border-radius: 12px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
 }
 
 .title {
   margin-bottom: 20px;
+  color: var(--text-h);
 }
 
 .keyboard-container {
@@ -74,13 +77,15 @@
 
 .key {
   padding: 12px;
-  border: 2px solid #333;
+  border: 2px solid var(--border);
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
   min-width: 40px;
   text-align: center;
   transition: transform 0.1s;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .key:active {
@@ -91,90 +96,35 @@
   min-width: 80px;
 }
 
-
-  @media (max-width: 1024px) {
-    .keyboard-row {
-      border-right: none;
-      border-bottom: 1px solid var(--border);
-    }
-  }
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.welcome-screen {
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  padding: 20px;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.description {
+  font-size: 1.2rem;
+  margin: 20px 0;
+  color: var(--text);
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
+.tutorial {
+  margin: 30px 0;
+  text-align: left;
+  background: var(--code-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
-
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+@media (max-width: 1024px) {
+  .keyboard-row {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 }
 
