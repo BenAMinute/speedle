@@ -19,12 +19,23 @@ function App() {
   const [gameStatus, setGameStatus] = useState<'playing' | 'won' | 'lost'>('playing')
   const [gameState, setGameState] = useState<'welcome' | 'playing' | 'won' | 'lost' | 'summary' | 'daily'>('welcome')
   
+useEffect(() => {
+  console.log('State currentguess:', currentGuess);
+}, [currentGuess]);
+
   const [timeLeft, setTimeLeft] = useState(90);
   const [selectedMode, setSelectedMode] = useState<GameMode>('easy');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [totalWordsCompleted, setTotalWordsCompleted] = useState(0);
   const [finalTime, setFinalTime] = useState(0);
 
+  useEffect(() => {
+    console.log('currentGuess:', currentGuess);
+  }, [currentGuess]);
+
+  useEffect(() => {
+    console.log('guesses:', guesses);
+  }, [guesses]);
 
   const startGame = () => {
     setGameState('playing');
@@ -125,33 +136,40 @@ function App() {
     }
 
         if (key.length === 1 && /[A-Z]/.test(key)) {
-  setCurrentGuess(prev => {
-    if (prev.length >= targetWordLength) return prev;
+          
+          
+          console.log('currentGuess before update:', currentGuess);
+          console.log('guesses:', guesses);
 
-    const newGuessStr = prev + key;
 
-    setGuesses(currGuesses => {
-      const newGuesses = [...currGuesses];
-
-      if (newGuesses.length === 0) {
-        return [{
-          letters: newGuessStr.split(''),
-          status: new Array(newGuessStr.length).fill('empty')
-        }];
-      }
-
-      newGuesses[newGuesses.length - 1] = {
-        letters: newGuessStr.split(''),
-        status: new Array(newGuessStr.length).fill('empty')
-      };
-
-      return newGuesses;
-    });
-
-    return newGuessStr;
-  });
-
-  return;
+          if (currentGuess.length < targetWordLength) {
+            const newGuessStr = currentGuess + key;
+            setCurrentGuess(newGuessStr);
+            
+            if (guesses.length > 0) {
+              const newGuesses = [...guesses];
+              const lastGuess = newGuesses[newGuesses.length - 1];
+              
+              if (lastGuess && lastGuess.letters.length === targetWordLength) {
+                newGuesses.push({
+                  letters: newGuessStr.split(''),
+                  status: new Array(newGuessStr.length).fill('empty'),
+                });
+              } else {
+                newGuesses[newGuesses.length - 1] = {
+                  letters: newGuessStr.split(''),
+                  status: new Array(newGuessStr.length).fill('empty'),
+                };
+              }
+              setGuesses(newGuesses);
+            } else {
+              setGuesses([{
+                letters: newGuessStr.split(''),
+                status: new Array(newGuessStr.length).fill('empty'),
+              }]);
+            }
+          }
+        }
 }
 
   useEffect(() => {
@@ -200,7 +218,7 @@ function App() {
         window.removeEventListener('keydown', handleKeyDown);
       };
     }
-  }, [gameState]);
+  }, [gameState, currentGuess, guesses, targetWordLength]);
 
   if (gameState === 'welcome') {
     return <WelcomeScreen 
